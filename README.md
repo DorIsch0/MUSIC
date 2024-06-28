@@ -19,14 +19,13 @@ Clone the repository into a directory. `cd` into that directory. Then run
 **(only run from that directory!)** to get the compiler `bin/music`. You can then run  
 ``bin/music <SOURCE> [-d<n>] [-o<OUTPUT>] [-i]``  
 **(again, only from that directory!)** with the following arguments:  
-`SOURCE`: The MIDI-file (or intermediate language file for `-i`).  
-`-d<n>`: Set the debug level to n. Default is 0 with no debug output.  
+- `SOURCE`: The MIDI-file (or intermediate language file for `-i`).  
+- `-d<n>`: Set the debug level to n. Default is 0 with no debug output. 
+  - on level 1, every argument you got along the translation from midi to intermediate code (inter) is printed, plus the resulting inter code at the end of the translation stage
+  - on level 2, the same as on level 1 gets printed plus the list of notes at the start of the program, the type of each translated argument, the sum of every translated token and, in the compilation stage, every line of the inter code before it gets compiled
+  - on level 3, the same as on level 2 gets printed plus the list of notes every time a token gets translated
+- `-o<OUTPUT>`: save the resulting .ll-file under OUTPUT (default is `out/out.ll`)  
+- `-i`: indicates that the input file already is an intermediate code file  
 
-- on level 1, every argument you got along the translation from midi to intermediate code (inter) is printed, plus the resulting inter code at the end of the translation stage
-- on level 2, the same as on level 1 gets printed plus the list of notes at the start of the program, the type of each translated argument, the sum of every translated token and, in the compilation stage, every line of the inter code before it gets compiled
-- on level 3, the same as on level 2 gets printed plus the list of notes every time a token gets translated  
-
-`-o<OUTPUT>`: save the resulting .ll-file under OUTPUT (default is `out/out.ll`)  
-`-i`: indicates that the input file already is an intermediate code file  
 Finally, you can run `clang` on your output file and then execute it.  
 
