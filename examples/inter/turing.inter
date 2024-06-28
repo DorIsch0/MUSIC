@@ -1,0 +1,318 @@
+str larr!8(i8)[] voutputMsg
+setAt voutputMsg li64[0] li8[79]
+setAt voutputMsg li64[1] li8[117]
+setAt voutputMsg li64[2] li8[116]
+setAt voutputMsg li64[3] li8[112]
+setAt voutputMsg li64[4] li8[117]
+setAt voutputMsg li64[5] li8[116]
+setAt voutputMsg li64[6] li8[58]
+setAt voutputMsg li64[7] li8[32]
+
+#rulesIn=input()
+inpS vrulesIn
+
+#startIn=input()
+#band=[i for i in startIn]
+inpS vband
+#str ldarr(i8)[] vband
+#len vstartIn vlen(startIn)
+#str li64[0] vi
+#lbl ainitBandStart
+#eq vi vlen(startIn) vi==len(startIn)
+#jmpif vi==len(startIn) ainitBandBreak
+#
+#add vi li64[1] vi
+#jmp ainitBandStart
+#ainitBandBreak
+#destroy vstartIn
+
+#rules=rulesIn.split(";")
+str ldarr(darr(i8))[] vrules
+getPtr vrules vrulesP
+call asplit lcoll{darr(i8),i8,ptr(darr(darr(i8))),}[vrulesIn,li8[59],vrulesP,]
+
+#states=[rule.split(",") for rule in rules]
+str ldarr(darr(darr(i8)))[] vstates
+str li64[0] vi
+len vrules vlen(rules)
+lbl asplitRulesStart
+eq vi vlen(rules) vi==len(rules)
+jmpif vi==len(rules) asplitRulesBreak
+getAt vrules vi vrules.i
+str ldarr(darr(i8))[] vstates.i
+getPtr vstates.i vstates.iP
+call asplit lcoll{darr(i8),i8,ptr(darr(darr(i8))),}[vrules.i,li8[44],vstates.iP,]
+append vstates vstates.i
+add vi li64[1] vi
+jmp asplitRulesStart
+lbl asplitRulesBreak
+destroy vrules
+#prt vstates
+#prtS li8[10]
+
+#state=0
+str li64[0] vstate
+
+#pos=0
+str li64[0] vpos
+
+##def printBand():
+##  print(pos*" "+"v\n"+"".join(band))
+
+#while True:
+lbl ainfLoopStart
+
+#  actState=states[state]
+getAt vstates vstate vactState
+
+#  while pos>=len(band):
+#    band.append(" ")
+lbl afillBandStart
+len vband vlen(band)
+gt vlen(band) vpos vpos<len(band)
+jmpif vpos<len(band) afillBandBreak
+append vband li8[32]
+jmp afillBandStart
+lbl afillBandBreak
+
+#  for i in range(len(actState)):
+len vactState vlen(actState)
+str li64[0] vi
+lbl areadStart
+eq vi vlen(actState) vi==len(actState)
+jmpif vi==len(actState) areadBreak
+
+#    if actState[i][0]==band[pos]:
+getAt vactState vi vactState.i
+getAt vactState.i li64[0] vactState.i.0
+getAt vband vpos vband.pos
+eq vactState.i.0 vband.pos vactState.i.0==band.pos
+not vactState.i.0==band.pos v!actState.i.0==band.pos
+jmpif v!actState.i.0==band.pos abeforeReadBreak
+
+#      band[pos]=actState[i][1]
+getAt vactState.i li64[1] vactState.i.1
+setAt vband vpos vactState.i.1
+
+#      toMove=0
+str li64[0] vtoMove
+
+#      j=2
+str li64[2] vj
+
+#      while j<len(actState[i]) and actState[i][j]=='r':
+len vactState.i vlen(actState.i)
+lbl areadRightStart
+gt vlen(actState.i) vj vj<len(actState.i)
+not vj<len(actState.i) v!(j<len(actState.i))
+jmpif v!(j<len(actState.i)) areadRightBreak
+getAt vactState.i vj vactState.i.j
+eq vactState.i.j li8[114] vactState.i.j=='r'
+not vactState.i.j=='r' v!(actState.i.j=='r')
+jmpif v!(actState.i.j=='r') areadRightBreak
+
+#        toMove+=1
+add vtoMove li64[1] vtoMove
+
+#        j+=1
+add vj li64[1] vj
+
+#    [end while 'r']
+jmp areadRightStart
+lbl areadRightBreak
+
+#prt vtoMove
+#prtS li8[10]
+
+#      while j<len(actState[i]) and actState[i][j]=='l':
+lbl areadLeftStart
+gt vlen(actState.i) vj vj<len(actState.i)
+not vj<len(actState.i) v!(j<len(actState.i))
+jmpif v!(j<len(actState.i)) areadLeftBreak
+getAt vactState.i vj vactState.i.j
+eq vactState.i.j li8[108] vactState.i.j=='l'
+not vactState.i.j=='l' v!(actState.i.j=='l')
+jmpif v!(actState.i.j=='l') areadLeftBreak
+
+#        toMove-=1
+sub vtoMove li64[1] vtoMove
+
+#        j+=1
+add vj li64[1] vj
+
+#      [end while 'l']
+jmp areadLeftStart
+lbl areadLeftBreak
+
+#      pos+=toMove
+add vpos vtoMove vpos
+
+#      while pos<0:
+lbl aincBandLeftStart
+gte vpos li64[0] vpos>=0
+jmpif vpos>=0 aincBandLeftBreak
+
+#        band.insert(0," ")
+insert vband li8[32] li64[0]
+
+#        pos+=1
+add vpos li64[1] vpos
+
+#      [end while pos<0]
+jmp aincBandLeftStart
+lbl aincBandLeftBreak
+
+#      stateChange=0
+str li64[0] vstateChange
+
+#      while j<len(actState[i]) and actState[i][j]=='+':
+lbl areadPlusStart
+gt vlen(actState.i) vj vj<len(actState.i)
+not vj<len(actState.i) v!(j<len(actState.i))
+jmpif v!(j<len(actState.i)) areadPlusBreak
+getAt vactState.i vj vactState.i.j
+eq vactState.i.j li8[43] vactState.i.j=='+'
+not vactState.i.j=='+' v!(actState.i.j=='+')
+jmpif v!(actState.i.j=='+') areadPlusBreak
+
+#        stateChange+=1
+add vstateChange li64[1] vstateChange
+
+#        j+=1
+add vj li64[1] vj
+
+#      [end while '+']
+jmp areadPlusStart
+lbl areadPlusBreak
+
+#      while j<len(actState[i]) and actState[i][j]=='-':
+lbl areadMinusStart
+gt vlen(actState.i) vj vj<len(actState.i)
+not vj<len(actState.i) v!(j<len(actState.i))
+jmpif v!(j<len(actState.i)) areadMinusBreak
+getAt vactState.i vj vactState.i.j
+eq vactState.i.j li8[45] vactState.i.j=='-'
+not vactState.i.j=='-' v!(actState.i.j=='-')
+jmpif v!(actState.i.j=='-') areadMinusBreak
+
+#        stateChange-=1
+sub vstateChange li64[1] vstateChange
+
+#        j+=1
+add vj li64[1] vj
+
+#      [end while '-']
+jmp areadMinusStart
+lbl areadMinusBreak
+
+#      state+=stateChange
+add vstate vstateChange vstate
+
+#      if j<len(actState[i]) and actState[i][j]=='T':
+gt vlen(actState.i) vj vj<len(actState.i)
+not vj<len(actState.i) v!(j<len(actState.i))
+jmpif v!(j<len(actState.i)) areadTBreak
+getAt vactState.i vj vactState.i.j
+eq vactState.i.j li8[84] vactState.i.j=='T'
+not vactState.i.j=='T' v!(actState.i.j=='T')
+jmpif v!(actState.i.j=='T') areadTBreak
+
+#        print("Output: "+"".join(band))
+prtS voutputMsg
+prtS vband
+prtS li8[10]
+
+#        exit()
+exit
+
+#      [end if 'T']
+lbl areadTBreak
+
+##      printBand()
+#      break
+jmp areadBreak
+
+#    [end for i]
+lbl abeforeReadBreak
+add vi li64[1] vi
+jmp areadStart
+lbl areadBreak
+
+#  [end while True]
+jmp ainfLoopStart
+
+##        print("Error: pos<0")
+#lbl aerror
+#str larr!13(i8)[] verrorMsg
+#setAt verrorMsg li64[0] li8[69]
+#setAt verrorMsg li64[1] li8[114]
+#setAt verrorMsg li64[2] li8[114]
+#setAt verrorMsg li64[3] li8[111]
+#setAt verrorMsg li64[4] li8[114]
+#setAt verrorMsg li64[5] li8[58]
+#setAt verrorMsg li64[6] li8[32]
+#setAt verrorMsg li64[7] li8[112]
+#setAt verrorMsg li64[8] li8[111]
+#setAt verrorMsg li64[9] li8[115]
+#setAt verrorMsg li64[10] li8[60]
+#setAt verrorMsg li64[11] li8[48]
+#setAt verrorMsg li64[12] li8[10]
+#prtS verrorMsg
+#
+##        exit()
+#exit
+
+#def split(str,del,retP):
+def asplit coll{darr(i8),i8,ptr(darr(darr(i8))),} vargs
+getAt vargs li32[0] vstr
+getAt vargs li32[1] vdel
+getAt vargs li32[2] vretP
+getAt vretP li64[0] vprevRet
+destroy vprevRet
+
+#  ret=[]
+str ldarr(darr(i8))[] vret
+
+#  act=[]
+str ldarr(i8)[] vact
+
+#  for i in range(len(str)):
+str li64[0] vi
+len vstr vlen(str)
+lbl aloopStart
+eq vi vlen(str) vi==len(str)
+jmpif vi==len(str) aloopBreak
+
+#    if str[i]==del:
+#    else:
+getAt vstr vi vstr.i
+eq vstr.i vdel vstr.i==del
+jmpif vstr.i==del asplitHere
+
+#      act.append(str[i])
+append vact vstr.i
+jmp aendif
+
+#    [if continued]
+lbl asplitHere
+
+#      ret.append(act)
+append vret vact
+
+#      act=[]
+str ldarr(i8)[] vact
+
+#    [endif]
+lbl aendif
+
+#  [end for i]
+add vi li64[1] vi
+jmp aloopStart
+lbl aloopBreak
+
+#  ret.append(act)
+append vret vact
+
+#  return ret
+setAt vretP li64[0] vret
+ret

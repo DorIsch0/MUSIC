@@ -1,0 +1,49 @@
+#n=int(input())
+inp i64 vn
+
+#ns=n*n
+mul vn vn vns
+
+#c=0
+str lf64[0] vc
+
+#for i in range(n):
+str li64[0] vi_
+lbl aiLoopStart
+
+# for j in range(n):
+#str li64[0] vj
+#lbl ajLoopStart
+div vi_ vn vi
+mul vi vn vi_-j
+sub vi_ vi_-j vj
+
+#  ds=i*i+j*j
+mul vi vi vis
+mul vj vj vjs
+add vis vjs vds
+
+#  if ds<ns:
+gte vds vns vds>=ns
+jmpif vds>=ns anoHit
+
+#   c+=8
+add vc lf64[8] vc
+
+#  [end if]
+lbl anoHit
+
+# [end for j]
+#add vj li64[1] vj
+#gt vn vj vn>j
+#jmpif vn>j ajLoopStart
+
+#[end for i]
+add vi_ li64[1] vi_
+gt vns vi_ vns>i_
+jmpif vns>i_ aiLoopStart
+
+#print(c/ns)
+cast vns f64 vnsf
+div vc vnsf vtau
+prt vtau
