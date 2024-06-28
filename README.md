@@ -30,6 +30,13 @@ Clone the repository into a directory. `cd` into that directory. Then run
 
 Finally, you can run `clang` on your output file and then execute it.  
 
+## Examples
+There is a directory of examples. Take a look at them - it makes understanding the documentation way easier. The intermediate language examples are found in `examples/inter`, the midi examples in `examples/midi`. The `examples/mscz` directory holds a MuseScore 3 project of the dart.mid example. Here is a list of all examples and what they do:
+- HelloWorld.inter and HelloWorld.mid: What did you expect?
+- dart.inter and dart.mid: computes Tau using the dartboard method
+- turing.inter and turing.mid: a working turing machine without proper documentation.
+Of those examples, only dart.mid follows the second design goal of sounding good, the other two were automatically created using `tools/inter2notes.py`.
+
 ## Documentation
 The compilation follows two steps: First, the MIDI data is translated into an intermediate language, which is then compiled into the .ll file. I will first introduce the intermediate language and then explain the translation stage.
 
