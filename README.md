@@ -215,6 +215,31 @@ Terminate the program.
 
 
 ### Translating from MIDI to Intermediate language
+The basic concept of representing the intermediate language in MIDI works by representing each token as a sequence of notes where the first and the last chord share the same lowest note and no chord in between does so. The pitches of the notes in between, more accurately: The signed distance from middle C (everything above has positive sign, everthing below negative) are used to represent the value of the token. We will call those signed distances of notes between the enclosing chords shifted pitch values or shortly SPVs. It works as follows:
+
+#### Encoding an operand
+The SPVs are summed up. The sum modulo 41 is the index of the operand in src/opsNew.csv. (There are 39 operands plus two nops in case I decide to expand the language later.)
+
+#### Encoding a type
+The SPVs are summed up. The sum modulo 29 is the index of the type in tools/types.txt. If the type is an integer or float, we are done. If the type is a ptr or darr, the next token (let's call it NT) will be its subtype.  
+If it is an arr, NT will represent its length: If the enclosing chords of NT have the same average velocity, the length will be the sum of the SPVs of NT, else it will be the number of chords in NT, i.e. the number of MIDI ticks between the enclosing chords of NT on which a note is started. The token after NT will then represent the subtype.  
+If the type is a coll, NT will represent its subtypes. All notes between the enclosing chords of NT are treated as a seperate list of tokens, i.e. we search that list for matching lowest notes and treat that part as a token for a subtype. You go through the list adding subtype after subtype until you reach the end.
+
+#### Encoding a variable or a label
+The SPVs are summed up. We then create the variable/label named `v<sum>` or `a<sum>` respectively. For example, if the sum is 40, the variable would be called `v40`.
+
+#### Encoding a literal
+The first token encodes the type. After the type token(s), the next token (NT) encodes the value (except for ptr, arr and darr, where there is no value). If the type is
+- an integer, the value of the literal is
+  - the sum of the SPVs of NT if the enclosing chords of NT have the same average velocity
+  - the number of chords in the NT else
+- a float, the value is a part before the decimal point and a point after, where
+  - the part before is encoded like an integer (see above) and
+  - the part after is encoded in the following way: You go through each chord and sum up the SPVs of that chord. You take the result mod 10 and append it to the number.
+- a coll, NT holds all "subvalues": You treat the list of notes between the closing chords of NT as a seperate list of tokens holding the subvalues. Each subvalue is a something.
+
+#### Encoding a something
+Same as encoding a variable or a literal, but if the enclosing chords of the first token have the same average velocity, it is a variable, else it is a literal.
 
 ## Tips for writing a MUSIC-programm
 If you want to write a MUSIC-programm, I recommend the following workflow:
