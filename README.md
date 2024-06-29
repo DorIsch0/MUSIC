@@ -42,7 +42,7 @@ The compilation follows two steps: First, the MIDI data is translated into an in
 
 ### The intermediate language
 #### Overview
-The intermediate language is pretty close to an assembly language. Each line consists of an operand followed by a number of arguments. The arguments can be one of five kinds: variable (v), literal (l), something (s), type (t) or label (l). As an example (which sadly uses information found below - just keep reading if you don't understand it yet), the `add` operand takes three arguments, the first two of type s, the third of type v, so for example adding the variables `v1` and `v2` and saving the result in `v3` would be written as `add v1 v2 v3`.
+The intermediate language is pretty close to an assembly language. Each line consists of an operator followed by a number of arguments. The arguments can be one of five kinds: variable (v), literal (l), something (s), type (t) or label (l). As an example (which sadly uses information found below - just keep reading if you don't understand it yet), the `add` operator takes three arguments, the first two of type s, the third of type v, so for example adding the variables `v1` and `v2` and saving the result in `v3` would be written as `add v1 v2 v3`.
 
 #### The kinds of arguments
 There are six groups of types: Integers, floating point, pointers, arrays, dynamic arrays and collections (which have a bad name - they really are structs).
@@ -61,12 +61,12 @@ Literals are written in the form `l<type>[<value>]`, where type follows the same
 - for a ptr, arr or darr typed literal as nothing, each literal of those types is uninitiallized and using its contents yields undefinied behaviour. Examples: `lptr(i64)[]` gives a null pointer, `larr!5(i64)[]` gives an empty array of five i64's and `ldarr(i64)[]` gives an empty darr (length 0) of i64's.
 - for a coll as a comma-seperated list of something-values (see below) with an additional comma at the end and no spaces in between, e.g. `lcoll{f32,f32,f32,}[lf32[3.],lf32[-1.1],v3,]` for a variable named `v3` of type `f32`
 
-Somethings are either variables or literals (they are used everywhere where the operand could take a literal value or a variable value) and are written the same way, e.g. when a something is expected, `v3` would be the value of the variable `v3` while `li32[4]` would instead be an integer value of type i32 and value 4.
+Somethings are either variables or literals (they are used everywhere where the operator could take a literal value or a variable value) and are written the same way, e.g. when a something is expected, `v3` would be the value of the variable `v3` while `li32[4]` would instead be an integer value of type i32 and value 4.
 
 Labels are written in the same form as variables except for an `a` instead of a `v`, e.g. `aloopStart`. They are used as points the code execution can jump to, so they are crucial for control flow.
 
-#### The operands
-All operands are listed along with their required argument kinds in `src/opsNew.csv`.
+#### The operators
+All operators are listed along with their required argument kinds in `src/opsNew.csv`.
 
 ##### nop
 Does nothing and takes no argument. Usage discouraged.
@@ -181,7 +181,7 @@ s has to be an integer, float or ptr. If the value in s is not 0 (or, equivalent
 Code execution will continue at label a. Jumping out of the current function, into a function, out of the current scope, into a scope or to a function name yields undefined behavior.
 
 ##### def a t v
-Start a function definition. Everything from here to the ret operand will be inside the function. a is the name of the function, t is the type of the function argument (has to be a coll type) and v is the name of the argument variable. In MUSIC, each function has exactly one argument, which is a coll. For functions without arguments, use an empty coll. For functions with a return value, use a coll holding a ptr to the return value's variable.
+Start a function definition. Everything from here to the ret operator will be inside the function. a is the name of the function, t is the type of the function argument (has to be a coll type) and v is the name of the argument variable. In MUSIC, each function has exactly one argument, which is a coll. For functions without arguments, use an empty coll. For functions with a return value, use a coll holding a ptr to the return value's variable.
 
 ##### call a s
 Call function a with argument s. Code execution will continue after the def statement for a and return here when ret is reached.  
@@ -224,8 +224,8 @@ Terminate the program.
 ### Translating from MIDI to Intermediate language
 The basic concept of representing the intermediate language in MIDI works by representing each token as a sequence of notes where the first and the last chord share the same lowest note and no chord in between does so. The pitches of the notes in between, more accurately: The signed distance from middle C (everything above has positive sign, everthing below negative) are used to represent the value of the token. We will call those signed distances of notes between the enclosing chords shifted pitch values or shortly SPVs. It works as follows:
 
-#### Encoding an operand
-The SPVs are summed up. The sum modulo 41 is the index of the operand in src/opsNew.csv. (There are 39 operands plus two nops in case I decide to expand the language later.)
+#### Encoding an operator
+The SPVs are summed up. The sum modulo 41 is the index of the operator in src/opsNew.csv. (There are 39 operators plus two nops in case I decide to expand the language later.)
 
 #### Encoding a type
 The SPVs are summed up. The sum modulo 29 is the index of the type in tools/types.txt. If the type is an integer or float, we are done. If the type is a ptr or darr, the next token (let's call it NT) will be its subtype.  
