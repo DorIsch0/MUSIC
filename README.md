@@ -215,7 +215,7 @@ Starts a scope. Don't know what you expected.
 I forgot...
 
 ##### prtS s
-s has to be a darr(i8) or a single i8. Interpret each i8 as a character and print them to the screen.
+s has to be a darr(i8), an array of i8's or a single i8. Interpret each i8 as a character and print them to the screen.
 
 ##### exit
 Terminate the program.
